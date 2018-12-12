@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+   <meta charset="UTF-8">
+   <title>Pantanal Growler</title>
+
+   <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+   <meta name="apple-mobile-web-app-capable" content="yes">
+   <link rel="apple-touch-icon" sizes="57x57" href="images/apple-icon-57x57.png">
+   <link rel="apple-touch-icon" sizes="60x60" href="images/apple-icon-60x60.png">
+   <link rel="apple-touch-icon" sizes="72x72" href="images/apple-icon-72x72.png">
+   <link rel="apple-touch-icon" sizes="76x76" href="images/apple-icon-76x76.png">
+   <link rel="apple-touch-icon" sizes="114x114" href="images/apple-icon-114x114.png">
+   <link rel="apple-touch-icon" sizes="120x120" href="images/apple-icon-120x120.png">
+   <link rel="apple-touch-icon" sizes="144x144" href="images/apple-icon-144x144.png">
+   <link rel="apple-touch-icon" sizes="152x152" href="images/apple-icon-152x152.png">
+   <link rel="apple-touch-icon" sizes="180x180" href="images/apple-icon-180x180.png">
+   <link rel="icon" type="image/png" sizes="192x192"  href="images/android-icon-192x192.png">
+   <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+   <link rel="icon" type="image/png" sizes="96x96" href="images/favicon-96x96.png">
+   <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+   
+   <!--<link rel="manifest" href="manifest.json">-->
+   <beta name="msapplication-TileColor" content="#ffffff">
+   <beta name="msapplication-TileImage" content="images/ms-icon-144x144.png">
+   <beta name="theme-color" content="#ffffff">
+
+   <link href="https://fonts.googleapis.com/css?family=Fira+Sans+Extra+Condensed:400,600" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css?family=Fugaz+One" rel="stylesheet">
+   <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+   <script src="https://jeromeetienne.github.io/AR.js/aframe/build/aframe-ar.js"></script>
+   <!--<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+   <script src="https://cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.min.js"></script>
+   <script src="https://unpkg.com/aframe-particle-system-component@1.0.x/dist/aframe-particle-system-component.min.js"></script>
+
+   <script>
+      //To avoid playing from start if the marker flickers, not sure if needed, but it might be a failsafe when you have mutiple markers and want to make sure the first finishes before launching the second
+      var playing = false;
+      //HTML5 audio, will need user touch input to start on mobile
+      var intro = new Audio("audio/SantaMotorcycle32b.mp3");
+      var intro2 = new Audio("audio/SantaRock32b.mp3");
+      //Detect end of audio
+      intro.addEventListener("ended", function() {
+	      intro.currentTime = 0;
+	      playing = false;
+      });
+      intro2.addEventListener("ended", function() {
+	      intro.currentTime = 0;
+	      playing = false;
+      });
+      AFRAME.registerComponent('markerhandler', {
+	      init: function() {
+		      // Set up the tick throttling. Will check if marker is active every 500ms
+		      this.tick = AFRAME.utils.throttleTick(this.tick, 500, this);
+	      },
+	      tick: function(t, dt) {
+		      if(document.querySelector("#marcador").object3D.visible == true && playing == false) { // && playing == false - para tocar 1 vez
+			      //MARKER IS PRESENT
+			      intro.play();
+               intro2.play();
+			      playing = true;
+            }
+		      else {
+                  // MARKER IS HIDDEN, do nothing (up to you)
+            }
+         }
+      });
+   </script>
+   <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body style="margin: 0px; overflow: hidden;">
+
+   <a-scene embedded arjs="debugUIEnabled: false;" vr-mode-ui="enabled: false">
+	<a-assets>
+		 <a-asset-item id="esfera" src="modelo_esfera/esferasimples.gltf"></a-asset-item>
+		 <a-asset-item id="santa" src="model/pantanalgrowler.gltf"></a-asset-item>
+	</a-assets>
+	<!--<a-assets>
+		<a-asset-item id="tree-obj" src="model/GARRAFA_3.obj"></a-asset-item>
+		<a-asset-item id="tree-mtl" src="model/GARRAFA_3.mtl"></a-asset-item>
+	</a-assets>-->
+      <a-marker markerhandler emitevents="true" cursor="rayOrigin: mouse" preset='custom' id="marcador" size='4.2' minConfidence='0.3' type='pattern' url='qrcode/Marker/marker2.patt'>
+	      <a-entity position="0 -2 -8"  rotation="-90 0 0" particle-system="preset: colour; color: #DAA520,#DAA520,#DAA520 ;
+        		particleCount: 800 ;texture:https://raw.githubusercontent.com/IdeaSpaceVR/aframe-particle-system-component/master/dist/images/raindrop.png ;size:2"></a-entity>  
+	      <a-entity geometry="primitive:box;" material="color:#fff;transparent:true;opacity:0" position="0 -1 0" scale="0.5 0.5 0.5">
+		 <!-- <a-entity id="garrafa"  position="0 -2 2" rotation="90 90 -90" scale="13 13 13" obj-model="obj:model/GARRAFA_3.obj;mtl:model/GARRAFA_3.mtl" mtl="#tree-mtl" mixin="null"></a-entity>-->
+		 <!--<a-curvedimage src="images/sexyladies.png" height="5.0" position="0 -2 0" radius="2.8" theta-start="-45" theta-length="72" rotation="-90 0 0" scale="1 1 1"></a-curvedimage>-->
+		 <a-entity id="gltf" position="0 -2 0" gltf-model="#santa" scale="1 1 1" rotation="-90 0 0" animation-mixer>
+            </a-entity>
+         <a-entity>
+      </a-marker>
+      <a-entity light="type:directional" position="-0.3 4.7 -1.5"></a-entity>
+      <a-entity light="color:#BBB;type:ambient" position="0 0 0"></a-entity>
+      <a-entity camera></a-entity>
+   </a-scene>  
+
+   <!-- frame components -->
+   <a class="logo right" href="https://pantanal-growler.negocio.site/" target="_blank"><img src="images/logo.png"></a>
+
+   <div id="footer">
+      
+         <p class="titulo-footer">Pantanal Growler<br>
+         <span class="endereco-footer">Rua Paraíba, 269 <br>Jd Estados - CG/MS</span></p>
+         <!-- <button id="snap-button"></button> -->  
+      
+      
+         <p class="p1"><a href="https://pt-br.facebook.com/pantanalgrowler/"><span class="logo-face" style="background-image: url('images/logo-facebook.png');"></span></a>
+         <a href="https://www.instagram.com/pantanalgrowler/?hl=pt-br"><span class="logo-instagram" style="background-image: url('images/logo-instagram.png');"></span></a>
+      <br>
+         <a href="http://www.senaiempresa.ms.senai.br/" class="senai-footer">Create by SENAI Empresa</a></p>
+      
+   </div>
+   <a id="download-link" style="display:none"></a>
+
+   <!--build:js js/main.min.js
+   <script src="js/main.js"></script>
+   <script src="js/merge.js"></script>
+   <script src="js/capture.js"></script>
+   <script src="js/index.js"></script>
+   <!-- endbuild -->
+
+</body>
+</html>
